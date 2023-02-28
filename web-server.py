@@ -6,9 +6,6 @@ error = {
     '404': "<h1>Error 404: Page not found</h1>"
 }
 
-ending = "\n<p>Webserver hosted on " + HOST + ":" + str(PORT) + "</p>"
-
-
 pages = {}
 
 pagesfileslistt = [os.path.join(dp, f.replace("\\", "/")) for dp, dn, filenames in os.walk("./server/") for f in filenames if os.path.splitext(f)[1] in (".html", ".css", ".js")]
@@ -41,12 +38,11 @@ while True:
         http_response = b"HTTP/1.1 404"
     else:
         response = pages.get((page + " ")[1:-1])
+        code = '200 OK'
         if not response:
-            if not pages.get('404'):
-                response = error['404'] + ending
-            else:
-                response = pages.get('404')
+            response = pages.get('404', error['404']):
+            code = '404 Not Found'
             print("  Page not found, sending 404")
-        http_response = b"HTTP/1.1 200 OK\n\"Content-Type\": \"text/" + bytes(response['type'], 'utf-8') + b"\"\n\n" + bytes(response['content'], 'utf-8')
+        http_response = b"HTTP/1.1 "+bytes(code)+"\n\"Content-Type\": \"text/" + bytes(response['type'], 'utf-8') + b"\"\n\n" + bytes(response['content'], 'utf-8')
     client_connection.sendall(http_response)
     client_connection.close()
